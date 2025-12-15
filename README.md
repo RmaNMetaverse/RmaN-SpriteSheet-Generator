@@ -1,9 +1,10 @@
-# Moses Sprite Packer
+# RmaN Spritesheet Generator
 
 
 
 <div align="center">
-![image info](./Screenshot.png)
+<img src="Screenshot.png" alt="Screenshot Image">
+   
 </div>
 
 
