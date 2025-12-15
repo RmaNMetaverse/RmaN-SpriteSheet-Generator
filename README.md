@@ -3,7 +3,7 @@
 
 
 <div align="center">
-![image info](./Screenshot.png)
+![Screenshot Image](Screenshot.png)
 </div>
 
 
