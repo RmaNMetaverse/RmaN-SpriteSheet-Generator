@@ -1,4 +1,4 @@
-# Moses Sprite Packer
+# RmaN Spritesheet Generator
 
 
 
