@@ -3,7 +3,7 @@
 
 
 <div align="center">
-<img src="Screenshot.ffg" alt="Screenshot Image">
+<img src="Screenshot.png" alt="Screenshot Image">
    
 </div>
 
