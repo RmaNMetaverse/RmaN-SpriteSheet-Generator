@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moses Pro Sprite Sheet Packer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        .checkerboard {
+            background-color: #1e293b;
+            background-image: 
+                linear-gradient(45deg, #334155 25%, transparent 25%), 
+                linear-gradient(-45deg, #334155 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #334155 75%), 
+                linear-gradient(-45deg, transparent 75%, #334155 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; 
+        }
+        .canvas-container {
+            max-height: 80vh;
+            overflow: auto;
+            border: 1px solid #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden font-sans">
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-700 p-4 flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-layer-group text-indigo-500 text-xl"></i>
+            <h1 class="text-xl font-bold tracking-wide">RmaN Sprite<span class="text-indigo-500"> Packer</span></h1>
+        </div>
+        <div class="text-xs text-slate-400">
+            Supports up to 16k textures
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar Controls -->
+        <aside class="w-80 bg-slate-800 border-r border-slate-700 flex flex-col shrink-0 z-10 overflow-y-auto">
+            
+            <!-- File Input -->
+            <div class="p-4 border-b border-slate-700">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Input Textures</label>
+                <div id="dropZone" class="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:bg-slate-700/50 transition cursor-pointer relative group">
+                    <input type="file" id="fileInput" multiple accept="image/png, image/jpeg, image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 mb-2 group-hover:text-indigo-400 transition"></i>
+                    <p class="text-xs text-slate-400 pointer-events-none">Drag & drop or click<br>to upload PNGs</p>
+                </div>
+                <div class="mt-2 flex justify-between text-xs text-slate-400">
+                    <span>Loaded: <span id="fileCount" class="text-white">0</span></span>
+                    <button id="clearBtn" class="text-red-400 hover:text-red-300 hidden">Clear</button>
+                </div>
+            </div>
+
+            <!-- Grid Settings -->
+            <div class="p-4 border-b border-slate-700 space-y-4">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Grid Configuration</h3>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Columns</label>
+                        <input type="number" id="colsInput" min="1" value="16" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Rows</label>
+                        <input type="number" id="rowsInput" min="1" value="16" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+                
+                <button id="autoGridBtn" class="w-full py-1.5 px-3 bg-slate-700 hover:bg-slate-600 text-xs rounded text-slate-300 transition">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Auto-Fit to Square
+                </button>
+            </div>
+
+            <!-- Resolution Settings -->
+            <div class="p-4 border-b border-slate-700 space-y-4">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Output Resolution</h3>
+                
+                <!-- Mode Toggle -->
+                <div class="flex bg-slate-900 rounded p-1">
+                    <button class="flex-1 py-1 text-xs rounded bg-indigo-600 text-white shadow" id="modeTotal">Total Size</button>
+                    <button class="flex-1 py-1 text-xs rounded hover:bg-slate-700 text-slate-400" id="modeTile">Tile Size</button>
+                </div>
+
+                <!-- Total Size Input -->
+                <div id="totalSizeControl">
+                    <label class="block text-xs text-slate-400 mb-1">Total Sheet Size (px)</label>
+                    <select id="totalSizeSelect" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none mb-2">
+                        <option value="512">512 x 512</option>
+                        <option value="1024">1024 x 1024</option>
+                        <option value="2048">2048 x 2048</option>
+                        <option value="4096" selected>4096 x 4096 (4k)</option>
+                        <option value="8192">8192 x 8192 (8k)</option>
+                        <option value="16384">16384 x 16384 (16k)</option>
+                        <option value="custom">Custom...</option>
+                    </select>
+                    <input type="number" id="customTotalSize" class="hidden w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm mb-1 placeholder-slate-500" placeholder="e.g. 4096">
+                    <div class="text-[10px] text-slate-500">
+                        Resulting Tile: <span id="calcTileSize" class="text-indigo-400">256</span> px
+                    </div>
+                </div>
+
+                <!-- Tile Size Input (Hidden by default) -->
+                <div id="tileSizeControl" class="hidden">
+                    <label class="block text-xs text-slate-400 mb-1">Per-Tile Size (px)</label>
+                    <input type="number" id="tileSizeInput" value="128" min="1" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none mb-1">
+                    <div class="text-[10px] text-slate-500">
+                        Resulting Sheet: <span id="calcTotalSize" class="text-indigo-400">2048</span> px
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="smoothScaling" checked class="rounded bg-slate-900 border-slate-600 text-indigo-500 focus:ring-offset-slate-800">
+                    <label for="smoothScaling" class="text-xs text-slate-300">Smooth Scaling (Bilinear)</label>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="p-4 mt-auto">
+                <button id="downloadBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-bold shadow-lg shadow-indigo-500/20 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-download mr-2"></i> Download Sprite Sheet
+                </button>
+                <div id="statusMsg" class="text-center text-xs mt-2 text-slate-400 h-4"></div>
+            </div>
+        </aside>
+
+        <!-- Preview Area -->
+        <main class="flex-1 bg-slate-950 relative flex flex-col">
+            <div class="absolute top-4 right-4 z-20 bg-slate-800/90 backdrop-blur px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300 shadow-lg">
+                Preview Mode (Scaled)
+            </div>
+            
+            <div class="flex-1 p-8 canvas-container checkerboard" id="canvasWrapper">
+                <canvas id="previewCanvas"></canvas>
+                <div id="emptyState" class="text-center text-slate-500 select-none">
+                    <i class="fa-regular fa-image text-6xl mb-4 opacity-20"></i>
+                    <p>No images loaded</p>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Hidden Canvas for full-res generation -->
+    <canvas id="outputCanvas" style="display: none;"></canvas>
+
+    <script>
+        // --- State ---
+        const state = {
+            files: [], // Array of { name, imgObject }
+            cols: 16,
+            rows: 16,
+            mode: 'total', // 'total' or 'tile'
+            targetTotalSize: 4096,
+            targetTileSize: 128,
+            smooth: true
+        };
+
+        // --- Elements ---
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileCountEl = document.getElementById('fileCount');
+        const clearBtn = document.getElementById('clearBtn');
+        
+        const colsInput = document.getElementById('colsInput');
+        const rowsInput = document.getElementById('rowsInput');
+        const autoGridBtn = document.getElementById('autoGridBtn');
+        
+        const modeTotalBtn = document.getElementById('modeTotal');
+        const modeTileBtn = document.getElementById('modeTile');
+        const totalSizeControl = document.getElementById('totalSizeControl');
+        const tileSizeControl = document.getElementById('tileSizeControl');
+        
+        const totalSizeSelect = document.getElementById('totalSizeSelect');
+        const customTotalSize = document.getElementById('customTotalSize');
+        const calcTileSizeEl = document.getElementById('calcTileSize');
+        
+        const tileSizeInput = document.getElementById('tileSizeInput');
+        const calcTotalSizeEl = document.getElementById('calcTotalSize');
+        
+        const smoothScalingChk = document.getElementById('smoothScaling');
+        
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        
+        const previewCanvas = document.getElementById('previewCanvas');
+        const outputCanvas = document.getElementById('outputCanvas');
+        const emptyState = document.getElementById('emptyState');
+
+        const ctxPreview = previewCanvas.getContext('2d');
+        const ctxOutput = outputCanvas.getContext('2d');
+
+        // --- Event Listeners ---
+
+        // File Handling
+        fileInput.addEventListener('change', handleFiles);
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-indigo-500', 'bg-slate-700');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-indigo-500', 'bg-slate-700');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-indigo-500', 'bg-slate-700');
+            if (e.dataTransfer.files.length) {
+                handleFileList(e.dataTransfer.files);
+            }
+        });
+        clearBtn.addEventListener('click', () => {
+            state.files = [];
+            updateUI();
+            drawPreview();
+        });
+
+        // Grid
+        colsInput.addEventListener('input', (e) => { state.cols = parseInt(e.target.value) || 1; updateCalculations(); drawPreview(); });
+        rowsInput.addEventListener('input', (e) => { state.rows = parseInt(e.target.value) || 1; updateCalculations(); drawPreview(); });
+        autoGridBtn.addEventListener('click', autoCalculateGrid);
+
+        // Mode Switching
+        modeTotalBtn.addEventListener('click', () => setMode('total'));
+        modeTileBtn.addEventListener('click', () => setMode('tile'));
+
+        // Resolution Inputs
+        totalSizeSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                customTotalSize.classList.remove('hidden');
+                state.targetTotalSize = parseInt(customTotalSize.value) || 4096;
+            } else {
+                customTotalSize.classList.add('hidden');
+                state.targetTotalSize = parseInt(e.target.value);
+            }
+            updateCalculations();
+            drawPreview();
+        });
+        customTotalSize.addEventListener('input', (e) => {
+            state.targetTotalSize = parseInt(e.target.value) || 4096;
+            updateCalculations();
+            drawPreview();
+        });
+        tileSizeInput.addEventListener('input', (e) => {
+            state.targetTileSize = parseInt(e.target.value) || 32;
+            updateCalculations();
+            drawPreview();
+        });
+        smoothScalingChk.addEventListener('change', (e) => {
+            state.smooth = e.target.checked;
+            drawPreview();
+        });
+
+        // Download
+        downloadBtn.addEventListener('click', generateDownload);
+
+
+        // --- Logic ---
+
+        function setMode(mode) {
+            state.mode = mode;
+            if (mode === 'total') {
+                modeTotalBtn.classList.add('bg-indigo-600', 'text-white', 'shadow');
+                modeTotalBtn.classList.remove('hover:bg-slate-700', 'text-slate-400');
+                modeTileBtn.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+                modeTileBtn.classList.add('hover:bg-slate-700', 'text-slate-400');
+                
+                totalSizeControl.classList.remove('hidden');
+                tileSizeControl.classList.add('hidden');
+            } else {
+                modeTileBtn.classList.add('bg-indigo-600', 'text-white', 'shadow');
+                modeTileBtn.classList.remove('hover:bg-slate-700', 'text-slate-400');
+                modeTotalBtn.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+                modeTotalBtn.classList.add('hover:bg-slate-700', 'text-slate-400');
+
+                tileSizeControl.classList.remove('hidden');
+                totalSizeControl.classList.add('hidden');
+            }
+            updateCalculations();
+            drawPreview();
+        }
+
+        function handleFiles(e) {
+            handleFileList(e.target.files);
+        }
+
+        async function handleFileList(fileList) {
+            statusMsg.textContent = "Loading images...";
+            
+            // Convert FileList to Array and sort alphabetically
+            const newFiles = Array.from(fileList).sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: 'base'}));
+            
+            const loadPromises = newFiles.map(file => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => resolve({ name: file.name, img: img });
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            const loadedImages = await Promise.all(loadPromises);
+            
+            // Append to existing or replace? Let's append for flexibility, user can clear.
+            state.files = [...state.files, ...loadedImages];
+            
+            // If this is the first batch, auto-set grid
+            if (state.files.length === loadedImages.length) {
+                autoCalculateGrid();
+            }
+
+            statusMsg.textContent = "";
+            updateUI();
+            drawPreview();
+        }
+
+        function updateUI() {
+            fileCountEl.textContent = state.files.length;
+            if (state.files.length > 0) {
+                clearBtn.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                previewCanvas.classList.remove('hidden');
+                downloadBtn.disabled = false;
+            } else {
+                clearBtn.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                previewCanvas.classList.add('hidden');
+                downloadBtn.disabled = true;
+            }
+        }
+
+        function autoCalculateGrid() {
+            if (state.files.length === 0) return;
+            const count = state.files.length;
+            const root = Math.ceil(Math.sqrt(count));
+            state.cols = root;
+            state.rows = Math.ceil(count / root);
+            
+            colsInput.value = state.cols;
+            rowsInput.value = state.rows;
+            updateCalculations();
+            drawPreview();
+        }
+
+        function updateCalculations() {
+            if (state.mode === 'total') {
+                // User sets total size, we derive tile size
+                // To avoid fractions, we might need to floor it
+                const exactTileW = state.targetTotalSize / state.cols;
+                const exactTileH = state.targetTotalSize / state.rows; // Keep square tiles based on width?
+                
+                // Usually spritesheets have square tiles. Let's assume the user wants the SHEET width to be targetTotalSize.
+                // And we want square tiles.
+                // TileSize = TotalWidth / Cols.
+                // TotalHeight = Rows * TileSize.
+                
+                const tileSize = state.targetTotalSize / state.cols;
+                // Just display it
+                calcTileSizeEl.textContent = Math.floor(tileSize * 100) / 100;
+            } else {
+                // User sets Tile Size. 
+                // Total Width = Cols * TileSize
+                // Total Height = Rows * TileSize
+                const totalW = state.cols * state.targetTileSize;
+                const totalH = state.rows * state.targetTileSize;
+                calcTotalSizeEl.textContent = `${totalW} x ${totalH}`;
+            }
+        }
+
+        function getDimensions() {
+            let tileW, tileH, sheetW, sheetH;
+
+            if (state.mode === 'total') {
+                // Priority: Fixed Width of Sheet.
+                // We enforce square tiles usually, but let's allow rectangular if the grid is odd?
+                // No, standard sprite sheets usually imply Uniform Cell Size.
+                
+                // Let's interpret "Total Resolution" as the Width of the texture (common in power of 2 limitations).
+                sheetW = state.targetTotalSize;
+                tileW = sheetW / state.cols;
+                tileH = tileW; // Force Square Tiles
+                
+                // Recalculate sheet Height based on rows
+                sheetH = tileH * state.rows; 
+                
+                // If the user meant "Total Size" as a square texture (e.g. 4096x4096),
+                // then tileH would be 4096/rows. This might result in non-square tiles.
+                // Let's assume Square Sheet constraint for the input "Total Size".
+                // If user selects 4096, they usually mean 4096x4096 image.
+                sheetH = state.targetTotalSize;
+                tileH = sheetH / state.rows;
+                
+                // Note: If cols != rows, tiles won't be square.
+                // If user wants square tiles, they should likely ensure cols == rows or use Tile Mode.
+            } else {
+                // Tile Mode
+                tileW = state.targetTileSize;
+                tileH = state.targetTileSize;
+                sheetW = tileW * state.cols;
+                sheetH = tileH * state.rows;
+            }
+
+            return { tileW, tileH, sheetW, sheetH };
+        }
+
+        function drawPreview() {
+            if (state.files.length === 0) return;
+
+            const dims = getDimensions();
+            
+            // Limit preview canvas size to avoid UI lag, but maintain aspect ratio
+            const MAX_PREVIEW = 1024;
+            const scale = Math.min(1, MAX_PREVIEW / Math.max(dims.sheetW, dims.sheetH));
+            
+            previewCanvas.width = dims.sheetW * scale;
+            previewCanvas.height = dims.sheetH * scale;
+
+            ctxPreview.imageSmoothingEnabled = state.smooth;
+            ctxPreview.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+
+            const pTileW = dims.tileW * scale;
+            const pTileH = dims.tileH * scale;
+
+            state.files.forEach((file, i) => {
+                // Grid position
+                const c = i % state.cols;
+                const r = Math.floor(i / state.cols);
+                
+                if (r >= state.rows) return; // Out of bounds
+
+                const x = c * pTileW;
+                const y = r * pTileH;
+
+                ctxPreview.drawImage(file.img, x, y, pTileW, pTileH);
+            });
+            
+            // Draw Grid Lines (Visual helper only on preview)
+            ctxPreview.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctxPreview.lineWidth = 1;
+            ctxPreview.beginPath();
+            
+            // Vertical lines
+            for (let c = 0; c <= state.cols; c++) {
+                ctxPreview.moveTo(c * pTileW, 0);
+                ctxPreview.lineTo(c * pTileW, previewCanvas.height);
+            }
+            // Horizontal lines
+            for (let r = 0; r <= state.rows; r++) {
+                ctxPreview.moveTo(0, r * pTileH);
+                ctxPreview.lineTo(previewCanvas.width, r * pTileH);
+            }
+            ctxPreview.stroke();
+        }
+
+        function generateDownload() {
+            if (state.files.length === 0) return;
+            statusMsg.textContent = "Generating full resolution...";
+            downloadBtn.disabled = true;
+
+            // Use requestAnimationFrame to allow UI to update with loading text
+            requestAnimationFrame(() => {
+                try {
+                    const dims = getDimensions();
+
+                    // Safety check for browser limits (approx 16k is safe in modern Chrome/FF)
+                    // 16384 * 16384 * 4 bytes = ~1GB raw.
+                    outputCanvas.width = dims.sheetW;
+                    outputCanvas.height = dims.sheetH;
+                    
+                    ctxOutput.imageSmoothingEnabled = state.smooth;
+                    ctxOutput.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+
+                    state.files.forEach((file, i) => {
+                        const c = i % state.cols;
+                        const r = Math.floor(i / state.cols);
+                        if (r >= state.rows) return;
+
+                        const x = c * dims.tileW;
+                        const y = r * dims.tileH;
+
+                        ctxOutput.drawImage(file.img, x, y, dims.tileW, dims.tileH);
+                    });
+
+                    // Download
+                    outputCanvas.toBlob((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `spritesheet_${dims.sheetW}x${dims.sheetH}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        statusMsg.textContent = "Download started!";
+                        downloadBtn.disabled = false;
+                        setTimeout(() => statusMsg.textContent = "", 3000);
+                    }, 'image/png');
+
+                } catch (e) {
+                    console.error(e);
+                    statusMsg.textContent = "Error: Resolution too high for this browser.";
+                    downloadBtn.disabled = false;
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

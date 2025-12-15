@@ -1,0 +1,15 @@
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Dependency & build artifacts
+node_modules/
+dist/
+build/
+*.log
+
+# Environment & editor state
+.env
+.env.local
+.vscode/
+.idea/
