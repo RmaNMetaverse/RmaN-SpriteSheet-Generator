@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moses Pro Sprite Sheet Packer</title>
+    <title>RmaN Pro Sprite Sheet Packer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
@@ -54,70 +54,70 @@
 <body class="h-screen flex flex-col overflow-hidden font-sans">
 
     <!-- Header -->
-    <header class="bg-slate-900 border-b border-slate-700 p-4 flex justify-between items-center shrink-0">
-        <div class="flex items-center gap-3">
-            <i class="fa-solid fa-layer-group text-indigo-500 text-xl"></i>
-            <h1 class="text-xl font-bold tracking-wide">RmaN Sprite<span class="text-indigo-500"> Packer</span></h1>
+    <header class="bg-slate-900 border-b border-slate-700 p-3 md:p-4 flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-2 md:gap-3">
+            <i class="fa-solid fa-layer-group text-indigo-500 text-lg md:text-xl"></i>
+            <h1 class="text-sm md:text-xl font-bold tracking-wide">RmaN Sprite<span class="text-indigo-500"> Packer</span></h1>
         </div>
-        <div class="text-xs text-slate-400">
-            Supports up to 16k textures
+        <div class="text-[10px] md:text-xs text-slate-400">
+            Up to 16k
         </div>
     </header>
 
     <!-- Main Content -->
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
         
         <!-- Sidebar Controls -->
-        <aside class="w-80 bg-slate-800 border-r border-slate-700 flex flex-col shrink-0 z-10 overflow-y-auto">
+        <aside class="w-full md:w-80 bg-slate-800 border-b md:border-r md:border-b-0 border-slate-700 flex flex-col shrink-0 z-10 overflow-y-auto max-h-[40vh] md:max-h-none">
             
             <!-- File Input -->
-            <div class="p-4 border-b border-slate-700">
-                <label class="block text-sm font-medium text-slate-300 mb-2">Input Textures</label>
-                <div id="dropZone" class="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:bg-slate-700/50 transition cursor-pointer relative group">
+            <div class="p-3 md:p-4 border-b border-slate-700">
+                <label class="block text-xs md:text-sm font-medium text-slate-300 mb-2">Input Textures</label>
+                <div id="dropZone" class="border-2 border-dashed border-slate-600 rounded-lg p-4 md:p-6 text-center hover:bg-slate-700/50 transition cursor-pointer relative group">
                     <input type="file" id="fileInput" multiple accept="image/png, image/jpeg, image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 mb-2 group-hover:text-indigo-400 transition"></i>
-                    <p class="text-xs text-slate-400 pointer-events-none">Drag & drop or click<br>to upload PNGs</p>
+                    <i class="fa-solid fa-cloud-arrow-up text-2xl md:text-3xl text-slate-500 mb-2 group-hover:text-indigo-400 transition"></i>
+                    <p class="text-[10px] md:text-xs text-slate-400 pointer-events-none">Drag & drop or click<br>to upload PNGs</p>
                 </div>
-                <div class="mt-2 flex justify-between text-xs text-slate-400">
+                <div class="mt-2 flex justify-between text-[10px] md:text-xs text-slate-400">
                     <span>Loaded: <span id="fileCount" class="text-white">0</span></span>
                     <button id="clearBtn" class="text-red-400 hover:text-red-300 hidden">Clear</button>
                 </div>
             </div>
 
             <!-- Grid Settings -->
-            <div class="p-4 border-b border-slate-700 space-y-4">
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Grid Configuration</h3>
+            <div class="p-3 md:p-4 border-b border-slate-700 space-y-4">
+                <h3 class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Grid Configuration</h3>
                 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Columns</label>
-                        <input type="number" id="colsInput" min="1" value="16" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none">
+                        <label class="block text-[10px] md:text-xs text-slate-400 mb-1">Columns</label>
+                        <input type="number" id="colsInput" min="1" value="16" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs md:text-sm focus:border-indigo-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Rows</label>
-                        <input type="number" id="rowsInput" min="1" value="16" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none">
+                        <label class="block text-[10px] md:text-xs text-slate-400 mb-1">Rows</label>
+                        <input type="number" id="rowsInput" min="1" value="16" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs md:text-sm focus:border-indigo-500 focus:outline-none">
                     </div>
                 </div>
                 
-                <button id="autoGridBtn" class="w-full py-1.5 px-3 bg-slate-700 hover:bg-slate-600 text-xs rounded text-slate-300 transition">
+                <button id="autoGridBtn" class="w-full py-1.5 px-3 bg-slate-700 hover:bg-slate-600 text-[10px] md:text-xs rounded text-slate-300 transition">
                     <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Auto-Fit to Square
                 </button>
             </div>
 
             <!-- Resolution Settings -->
-            <div class="p-4 border-b border-slate-700 space-y-4">
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Output Resolution</h3>
+            <div class="p-3 md:p-4 border-b border-slate-700 space-y-4">
+                <h3 class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Output Resolution</h3>
                 
                 <!-- Mode Toggle -->
                 <div class="flex bg-slate-900 rounded p-1">
-                    <button class="flex-1 py-1 text-xs rounded bg-indigo-600 text-white shadow" id="modeTotal">Total Size</button>
-                    <button class="flex-1 py-1 text-xs rounded hover:bg-slate-700 text-slate-400" id="modeTile">Tile Size</button>
+                    <button class="flex-1 py-1 text-[10px] md:text-xs rounded bg-indigo-600 text-white shadow" id="modeTotal">Total Size</button>
+                    <button class="flex-1 py-1 text-[10px] md:text-xs rounded hover:bg-slate-700 text-slate-400" id="modeTile">Tile Size</button>
                 </div>
 
                 <!-- Total Size Input -->
                 <div id="totalSizeControl">
-                    <label class="block text-xs text-slate-400 mb-1">Total Sheet Size (px)</label>
-                    <select id="totalSizeSelect" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none mb-2">
+                    <label class="block text-[10px] md:text-xs text-slate-400 mb-1">Total Sheet Size (px)</label>
+                    <select id="totalSizeSelect" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs md:text-sm focus:border-indigo-500 focus:outline-none mb-2">
                         <option value="512">512 x 512</option>
                         <option value="1024">1024 x 1024</option>
                         <option value="2048">2048 x 2048</option>
@@ -126,47 +126,47 @@
                         <option value="16384">16384 x 16384 (16k)</option>
                         <option value="custom">Custom...</option>
                     </select>
-                    <input type="number" id="customTotalSize" class="hidden w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm mb-1 placeholder-slate-500" placeholder="e.g. 4096">
-                    <div class="text-[10px] text-slate-500">
+                    <input type="number" id="customTotalSize" class="hidden w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs md:text-sm mb-1 placeholder-slate-500" placeholder="e.g. 4096">
+                    <div class="text-[9px] md:text-[10px] text-slate-500">
                         Resulting Tile: <span id="calcTileSize" class="text-indigo-400">256</span> px
                     </div>
                 </div>
 
                 <!-- Tile Size Input (Hidden by default) -->
                 <div id="tileSizeControl" class="hidden">
-                    <label class="block text-xs text-slate-400 mb-1">Per-Tile Size (px)</label>
-                    <input type="number" id="tileSizeInput" value="128" min="1" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm focus:border-indigo-500 focus:outline-none mb-1">
-                    <div class="text-[10px] text-slate-500">
+                    <label class="block text-[10px] md:text-xs text-slate-400 mb-1">Per-Tile Size (px)</label>
+                    <input type="number" id="tileSizeInput" value="128" min="1" class="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs md:text-sm focus:border-indigo-500 focus:outline-none mb-1">
+                    <div class="text-[9px] md:text-[10px] text-slate-500">
                         Resulting Sheet: <span id="calcTotalSize" class="text-indigo-400">2048</span> px
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2">
                     <input type="checkbox" id="smoothScaling" checked class="rounded bg-slate-900 border-slate-600 text-indigo-500 focus:ring-offset-slate-800">
-                    <label for="smoothScaling" class="text-xs text-slate-300">Smooth Scaling (Bilinear)</label>
+                    <label for="smoothScaling" class="text-[10px] md:text-xs text-slate-300">Smooth Scaling (Bilinear)</label>
                 </div>
             </div>
 
             <!-- Actions -->
-            <div class="p-4 mt-auto">
-                <button id="downloadBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-bold shadow-lg shadow-indigo-500/20 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <div class="p-3 md:p-4 mt-auto">
+                <button id="downloadBtn" class="w-full py-2 md:py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-bold text-sm md:text-base shadow-lg shadow-indigo-500/20 transition disabled:opacity-50 disabled:cursor-not-allowed">
                     <i class="fa-solid fa-download mr-2"></i> Download Sprite Sheet
                 </button>
-                <div id="statusMsg" class="text-center text-xs mt-2 text-slate-400 h-4"></div>
+                <div id="statusMsg" class="text-center text-[10px] md:text-xs mt-2 text-slate-400 h-4"></div>
             </div>
         </aside>
 
         <!-- Preview Area -->
-        <main class="flex-1 bg-slate-950 relative flex flex-col">
-            <div class="absolute top-4 right-4 z-20 bg-slate-800/90 backdrop-blur px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300 shadow-lg">
+        <main class="flex-1 bg-slate-950 relative flex flex-col min-h-[40vh] md:min-h-auto">
+            <div class="absolute top-2 right-2 md:top-4 md:right-4 z-20 bg-slate-800/90 backdrop-blur px-2 md:px-3 py-1 md:py-1.5 rounded border border-slate-700 text-[10px] md:text-xs text-slate-300 shadow-lg">
                 Preview Mode (Scaled)
             </div>
             
-            <div class="flex-1 p-8 canvas-container checkerboard" id="canvasWrapper">
+            <div class="flex-1 p-4 md:p-8 canvas-container checkerboard" id="canvasWrapper">
                 <canvas id="previewCanvas"></canvas>
                 <div id="emptyState" class="text-center text-slate-500 select-none">
-                    <i class="fa-regular fa-image text-6xl mb-4 opacity-20"></i>
-                    <p>No images loaded</p>
+                    <i class="fa-regular fa-image text-4xl md:text-6xl mb-4 opacity-20"></i>
+                    <p class="text-sm md:text-base">No images loaded</p>
                 </div>
             </div>
         </main>
