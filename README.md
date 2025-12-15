@@ -4,7 +4,6 @@
 
 <div align="center">
 <img src="Screenshot.png" alt="Screenshot Image">
-   
 </div>
 
 
@@ -19,6 +18,9 @@ A browser-based HTML5 spritesheet packer with live preview. Drop in multiple PNG
 - Exports PNG spritesheets with filenames that include output dimensions
 
 ## Getting Started
+you can use it here online: <a href="https://rmanmetaverse.github.io/RmaN-SpriteSheet-Generator/"> RmaN SpriteSheet Generator </a>
+
+or locally
 1. Open `index.html` in any modern desktop browser (Chrome/Firefox/Edge). No build steps required.
 2. Drag and drop your images onto the input area or use the file picker.
 3. Adjust grid (rows/cols) and sizing mode:
